@@ -55,3 +55,10 @@ def test_2016_early_closes():
         market_close = schedule.loc[dt].market_close
         # all ICE early closes are 1 pm local
         assert market_close.tz_convert(ice.tz).hour == 13
+
+
+def test_2025_carter_day_of_mourning_open():
+    # ICE Futures U.S. traded regular hours for all but a handful of contracts on 2025-01-09
+    # https://www.ice.com/publicdocs/futures_us/exchange_notices/ICE_Futures_US_ExNot2024MomentOfSilence20241230.pdf
+    dates_open = ICEExchangeCalendar().valid_days("2025-01-06", "2025-01-10")
+    assert pd.Timestamp("2025-01-09", tz="UTC") in dates_open

@@ -69,7 +69,9 @@ class ICEExchangeCalendar(MarketCalendar):
     def adhoc_holidays(self) -> List[Any]:
         return list(
             chain(
-                USNationalDaysofMourning,
+                # ICE Futures U.S. kept regular hours for nearly all contracts on the 2025-01-09 day of mourning
+                # https://www.ice.com/publicdocs/futures_us/exchange_notices/ICE_Futures_US_ExNot2024MomentOfSilence20241230.pdf
+                [d for d in USNationalDaysofMourning if d != Timestamp("2025-01-09", tz="UTC")],
                 # ICE was only closed on the first day of the Hurricane Sandy
                 # closings (was not closed on 2012-10-30)
                 [Timestamp("2012-10-29", tz="UTC")],
