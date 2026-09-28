@@ -56,3 +56,13 @@ def test_dec_jan():
 
     assert schedule["market_open"].iloc[0] == pd.Timestamp("2020-12-30 01:00:00", tz="UTC")
     assert schedule["market_close"].iloc[6] == pd.Timestamp("2021-01-08 19:20:00", tz="UTC")
+
+
+def test_2025_carter_day_of_mourning_early_close():
+    # CME closed agricultural markets early at 12:15 CT on the National Day of Mourning for President Carter
+    # https://investor.cmegroup.com/news-releases/news-release-details/cme-group-announces-trading-hours-us-national-day-mourning-honor
+    cme = CMEAgricultureExchangeCalendar()
+    assert pd.Timestamp("2025-01-09") not in cme.holidays().holidays
+    schedule = cme.schedule("2025-01-08", "2025-01-10", tz="America/Chicago")
+    assert schedule.loc["2025-01-09", "market_close"] == pd.Timestamp("2025-01-09 12:15", tz="America/Chicago")
+    assert schedule.loc["2025-01-10", "market_close"] == pd.Timestamp("2025-01-10 13:20", tz="America/Chicago")

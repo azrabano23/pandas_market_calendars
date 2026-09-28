@@ -60,3 +60,12 @@ def test_good_fridays():
     assert schedule.loc[pd.Timestamp("2021-04-02"), "market_close"] == pd.Timestamp(
         "2021-04-02", tz="America/Chicago"
     ).replace(hour=10, minute=00).tz_convert("UTC")
+
+
+def test_2025_carter_day_of_mourning_early_close():
+    # CME closed interest rate markets early at 12:15 CT on the National Day of Mourning for President Carter
+    # https://investor.cmegroup.com/news-releases/news-release-details/cme-group-announces-trading-hours-us-national-day-mourning-honor
+    cme = CMEBondExchangeCalendar()
+    schedule = cme.schedule("2025-01-08", "2025-01-10", tz="America/Chicago")
+    assert schedule.loc["2025-01-09", "market_close"] == pd.Timestamp("2025-01-09 12:15", tz="America/Chicago")
+    assert schedule.loc["2025-01-10", "market_close"] == pd.Timestamp("2025-01-10 16:00", tz="America/Chicago")

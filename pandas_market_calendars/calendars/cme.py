@@ -61,6 +61,11 @@ from pandas_market_calendars.market_calendar import MarketCalendar
 CME_EQUITY_LEGACY_HOURS_START = "2005-09-12"
 CME_EQUITY_MODERN_HOURS_START = "2012-11-19"
 
+# CME did not close for the National Day of Mourning for President Carter. Agricultural, equity and interest rate
+# markets closed early instead: https://investor.cmegroup.com/news-releases/news-release-details/cme-group-announces-trading-hours-us-national-day-mourning-honor
+CarterDayOfMourning2025 = [Timestamp("2025-01-09", tz="UTC")]
+CMENationalDaysofMourning = [d for d in USNationalDaysofMourning if d not in CarterDayOfMourning2025]
+
 
 class CMETradeDateCalendar(MarketCalendar):
     """
@@ -166,7 +171,11 @@ class CMEEquityExchangeCalendar(MarketCalendar):
 
     @property
     def adhoc_holidays(self) -> List[Any]:
-        return USNationalDaysofMourning
+        return CMENationalDaysofMourning
+
+    @property
+    def special_closes_adhoc(self) -> List[Any]:
+        return [(time(8, 30, tzinfo=self.tz), CarterDayOfMourning2025)]
 
     @property
     def special_closes(self) -> List[Any]:
@@ -260,7 +269,7 @@ class CMEAgricultureExchangeCalendar(MarketCalendar):
 
     @property
     def adhoc_holidays(self) -> List[Any]:
-        return USNationalDaysofMourning
+        return CMENationalDaysofMourning
 
     @property
     def special_closes(self) -> List[Any]:
@@ -276,6 +285,10 @@ class CMEAgricultureExchangeCalendar(MarketCalendar):
                 ),
             )
         ]
+
+    @property
+    def special_closes_adhoc(self) -> List[Any]:
+        return [(time(12, 15, tzinfo=self.tz), CarterDayOfMourning2025)]
 
 
 # For the bond market Good Friday that coincides with the release of NFP on the first friday of the month is an open day
@@ -460,7 +473,7 @@ class CMEBondExchangeCalendar(MarketCalendar):
 
     @property
     def adhoc_holidays(self) -> List[Any]:
-        return list(chain(USNationalDaysofMourning, BondsGoodFridayClosed))
+        return list(chain(CMENationalDaysofMourning, BondsGoodFridayClosed))
 
     @property
     def special_closes(self) -> List[Any]:
@@ -492,4 +505,7 @@ class CMEBondExchangeCalendar(MarketCalendar):
 
     @property
     def special_closes_adhoc(self) -> List[Any]:
-        return [(time(10, tzinfo=self.tz), BondsGoodFridayOpen)]
+        return [
+            (time(10, tzinfo=self.tz), BondsGoodFridayOpen),
+            (time(12, 15, tzinfo=self.tz), CarterDayOfMourning2025),
+        ]

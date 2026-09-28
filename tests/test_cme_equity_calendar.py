@@ -147,3 +147,12 @@ def test_good_friday_2026_has_early_close_session():
     session = schedule.loc["2026-04-03"]
     assert session.market_open == pd.Timestamp("2026-04-02 18:00:00", tz="America/New_York")
     assert session.market_close == pd.Timestamp("2026-04-03 09:15:00", tz="America/New_York")
+
+
+def test_2025_carter_day_of_mourning_early_close():
+    # CME equity markets were open until 8:30 CT on the National Day of Mourning for President Carter
+    # https://investor.cmegroup.com/news-releases/news-release-details/cme-group-announces-trading-hours-us-national-day-mourning-honor
+    cme = CMEEquityExchangeCalendar()
+    schedule = cme.schedule("2025-01-08", "2025-01-10", tz="America/Chicago")
+    assert schedule.loc["2025-01-09", "market_close"] == pd.Timestamp("2025-01-09 08:30", tz="America/Chicago")
+    assert schedule.loc["2025-01-10", "market_close"] == pd.Timestamp("2025-01-10 16:00", tz="America/Chicago")
